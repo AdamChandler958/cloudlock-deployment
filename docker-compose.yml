@@ -5,6 +5,7 @@ services:
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    restarts: true
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -12,11 +13,12 @@ services:
       - minio_data:/data
     command: server --console-address ":9001" /data
 
-  minio-redis-api-service:
+  minio-api-service:
     build:
       context: ../cloudlock-file-system/
       dockerfile: infra/Dockerfile
-    image: minio-redis-api-service:latest
+    image: minio-api-service:latest
+    restarts: true
     depends_on:
       - promtail
     ports:
