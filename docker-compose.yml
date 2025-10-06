@@ -5,7 +5,7 @@ services:
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
-    restarts: true
+    restart: "always"
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -18,11 +18,34 @@ services:
       context: ../cloudlock-file-system/
       dockerfile: infra/Dockerfile
     image: minio-api-service:latest
-    restarts: true
+    restart: "always"
     depends_on:
       - promtail
+      - minio
     ports:
       - "3000:3000"
+
+  redis-api-service:
+    build:
+      context: ../cloudlock-redis-service
+      dockerfile: Dockerfile
+    image: redis-api-service:latest
+    restart: "always"
+    ports:
+      - "3080:3080"
+    depends_on:
+      - promtail
+      - redis
+
+  redis:
+    image: redis/redis-stack:latest
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    restart: "always"
+    ports:
+      - "${REDIS_PORT}:${REDIS_PORT}"
+      - "8001:8001"
+    volumes:
+      - redis-data:/data
 
   loki:
     image: grafana/loki:latest
@@ -56,8 +79,10 @@ services:
       - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/usr/share/grafana/public/dashboards/home.json
     depends_on:
       - loki
+    restart: "always"
 
 volumes:
   minio_data:
   loki-data:
   grafana-data:
+  redis-data:
