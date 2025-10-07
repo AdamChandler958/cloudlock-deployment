@@ -22,7 +22,6 @@ services:
     depends_on:
       - promtail
       - minio
-      - redis-api-service
     ports:
       - "3000:3000"
 
