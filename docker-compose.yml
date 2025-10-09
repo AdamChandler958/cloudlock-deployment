@@ -16,7 +16,7 @@ services:
   minio-api-service:
     build:
       context: ../cloudlock-file-system/
-      dockerfile: infra/Dockerfile
+      dockerfile: Dockerfile
     image: minio-api-service:latest
     restart: "always"
     depends_on:
